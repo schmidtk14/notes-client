@@ -52,20 +52,32 @@ export default function Notes() {
     file.current = event.target.files[0];
   }
   
+  function saveNote(note) {
+    return API.put("notes", `/notes/${id}`, {
+      body: note
+    });
+  }
+  
   async function handleSubmit(event) {
     let attachment;
   
     event.preventDefault();
   
-    if (file.current && file.current.size > config.MAX_ATTACHMENT_SIZE) {
-      alert(
-        `Please pick a file smaller than ${config.MAX_ATTACHMENT_SIZE /
-          1000000} MB.`
-      );
-      return;
-    }
+
   
     setIsLoading(true);
+  
+    try {
+  
+      await saveNote({
+        content,
+        attachment: attachment || note.attachment
+      });
+      history.push("/");
+    } catch (e) {
+      onError(e);
+      setIsLoading(false);
+    }
   }
   
   async function handleDelete(event) {
